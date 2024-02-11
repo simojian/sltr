@@ -1,0 +1,14 @@
+C:\Users\Notebook\source\repos\sltr\sltr\bin\Debug\net6.0\sltr.exe
+C:\Users\Notebook\source\repos\sltr\sltr\bin\Debug\net6.0\sltr.deps.json
+C:\Users\Notebook\source\repos\sltr\sltr\bin\Debug\net6.0\sltr.runtimeconfig.json
+C:\Users\Notebook\source\repos\sltr\sltr\bin\Debug\net6.0\sltr.dll
+C:\Users\Notebook\source\repos\sltr\sltr\bin\Debug\net6.0\sltr.pdb
+C:\Users\Notebook\source\repos\sltr\sltr\obj\Debug\net6.0\sltr.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Notebook\source\repos\sltr\sltr\obj\Debug\net6.0\sltr.AssemblyInfoInputs.cache
+C:\Users\Notebook\source\repos\sltr\sltr\obj\Debug\net6.0\sltr.AssemblyInfo.cs
+C:\Users\Notebook\source\repos\sltr\sltr\obj\Debug\net6.0\sltr.csproj.CoreCompileInputs.cache
+C:\Users\Notebook\source\repos\sltr\sltr\obj\Debug\net6.0\sltr.dll
+C:\Users\Notebook\source\repos\sltr\sltr\obj\Debug\net6.0\refint\sltr.dll
+C:\Users\Notebook\source\repos\sltr\sltr\obj\Debug\net6.0\sltr.pdb
+C:\Users\Notebook\source\repos\sltr\sltr\obj\Debug\net6.0\sltr.genruntimeconfig.cache
+C:\Users\Notebook\source\repos\sltr\sltr\obj\Debug\net6.0\ref\sltr.dll
