@@ -63,7 +63,7 @@ namespace sltr
             }
         }
 
-        string suit2nick(suits val)
+        public string suit2nick(suits val)
         {
             switch (val)
             {

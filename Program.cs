@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography.X509Certificates;
+﻿using System.Runtime.ExceptionServices;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace sltr
@@ -9,6 +10,7 @@ namespace sltr
         static Deck deck = new Deck();
         static Stack[] rows = new Stack[7];
         static Stack drawPile = new Stack();
+        static Stack[] solvedPiles = new Stack[4];
 
         //gameplay variables
         static string nextCommand = "Start of game!";
@@ -24,6 +26,11 @@ namespace sltr
             for (int i = 0; i < rows.Length; i++)
             {
                 rows[i] = new Stack();
+            }
+
+            for (int i = 0; i < solvedPiles.Length; i++)
+            {
+                solvedPiles[i] = new Stack();
             }
 
             //Setting up the main deck of cards
@@ -141,24 +148,50 @@ namespace sltr
             CardPile placingPile = null;
             int cardDepth = 0;
 
+            
+
             //check if taking from pile
             if (input1.ToUpper() == "PILE")
             {
                 takingPile = drawPile;
                 cardDepth = 0;
+
+                placingPile = rows[fixedInput2];
+
+                MoveCards(takingPile, placingPile, cardDepth);
+            }
+            if (input2.ToUpper() == "S")
+            {
+
+                cardDepth = 0;
+
+                int x = InputCardPos(input1)[0];
+
+                if (x != 999)
+                {
+                    MoveCards(rows[x]);
+                }
+
+
             }
             else
             {
                 int rowNum = InputCardPos(input1)[0];
                 int depth = InputCardPos(input1)[1];
 
-                takingPile = rows[rowNum];
-                cardDepth = takingPile.Count() - depth;
+                if (depth != 999)
+                {
+
+                    takingPile = rows[rowNum];
+                    cardDepth = takingPile.Count() - depth;
+
+                    placingPile = rows[fixedInput2];
+
+                    MoveCards(takingPile, placingPile, cardDepth);
+                }
             }
 
-            placingPile = rows[fixedInput2];
-
-            MoveCards(takingPile, placingPile, cardDepth);
+            
         }
 
         static void MoveCards(CardPile takingPile, CardPile placingPile, int depth = 0)
@@ -168,6 +201,21 @@ namespace sltr
             Card placeCard = placingPile.DrawCard(true);
             Card checkCard = takingPile.DrawCard(true, depth);
 
+            if ((checkCard == null && placeCard.value == 13))
+            {
+                for (int i = 0; i <= depth; i++)
+                {
+                    takenCards.Add(takingPile.DrawCard());
+                }
+
+                for (int i = takenCards.Count; i > 0; i--)
+                {
+                    placingPile.Add(takenCards[i - 1]);
+                }
+
+                nextCommand = "Moved Cards.";
+            }
+
             if (CheckCorrectOrder(checkCard, placeCard)) 
             {
                 for (int i = 0; i <= depth; i++)
@@ -175,9 +223,9 @@ namespace sltr
                     takenCards.Add(takingPile.DrawCard());
                 }
 
-                for (int i = 0; i < takenCards.Count; i++)
+                for (int i = takenCards.Count; i > 0; i--)
                 {
-                    placingPile.Add(takenCards[i]);
+                    placingPile.Add(takenCards[i - 1]);
                 }
 
                 nextCommand = "Moved Cards.";
@@ -189,6 +237,58 @@ namespace sltr
             
         }
 
+        static void MoveCards(CardPile inputPile)
+        {
+            Card inputCard = inputPile.DrawCard(true);
+
+            bool successful = false;
+
+            switch (inputCard.suit)
+            {
+                case suits.Hearts:
+                    successful = MoveToSolve(inputCard, 0);
+                    break;
+                case suits.Spades:
+                    successful = MoveToSolve(inputCard, 1);
+                    break;
+                case suits.Diamonds:
+                    successful = MoveToSolve(inputCard, 2);
+                    break;
+                case suits.Clubs:
+                    successful = MoveToSolve(inputCard, 3);
+                    break;
+            }
+
+            if (successful)
+            {
+                inputPile.Cards.Remove(inputCard);
+                nextCommand = "Moved Card.";
+            }
+            else
+            {
+                nextCommand = "Can't move here.";
+            }
+
+        }
+
+        static bool MoveToSolve(Card input, int id)
+        {
+            if (solvedPiles[id].DrawCard(true) == null && input.value == 1)
+            {
+                solvedPiles[id].Add(input);
+                return true;
+            }
+            else if (solvedPiles[id].DrawCard(true).value == input.value - 1)
+            {
+                solvedPiles[id].Add(input);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         //=====UTILITY FUNCTIONS=======
 
         static int[] InputCardPos(string input)
@@ -197,8 +297,18 @@ namespace sltr
 
             int[] output = new int[2];
 
+            bool isCorrect;
+
             output[0] = Letter2Number(x[0].ToString());
-            output[1] = Int32.Parse(x[1].ToString());
+            isCorrect = Int32.TryParse(x[1].ToString(), out output[1]);
+
+            if(isCorrect)
+            {
+                return output;
+            }
+
+            output[0] = 999;
+            output[1] = 999;
 
             return output;
         }
@@ -276,7 +386,7 @@ namespace sltr
             //write the previous move
             Console.WriteLine(nextCommand);
             //Draws the current top card ont the draw pile
-            Console.Write("Draw Pile: " + drawPile.ViewCard(drawPile.Count() - 1));
+            Console.Write("Draw Pile: " + drawPile.ViewCard(drawPile.Count() - 1) + "   |   " + WriteSolved());
             Console.WriteLine();
 
             //Write the rows
@@ -287,6 +397,40 @@ namespace sltr
             Console.WriteLine("==================================================================");
             Console.WriteLine();
             Console.WriteLine("Input Command: ");
+        }
+
+        static string WriteSolved()
+        {
+            string output = "";
+
+            for (int i = 0; i < solvedPiles.Length; i++)
+            {
+
+                switch (i)
+                {
+                    case 0:
+                        output += "♥";
+                        break;
+                    case 1:
+                        output += "♤";
+                        break;
+                    case 2:
+                        output += "♦";
+                        break;
+                    case 3:
+                        output += "♧";
+                        break;
+                    default:
+                        output += "█";
+                        break;
+                }
+
+                output += ": " + solvedPiles[i].ViewCard(solvedPiles[i].Count() - 1) + "  ";
+
+
+            }
+
+            return output;
         }
 
         //Draws the rows in the 

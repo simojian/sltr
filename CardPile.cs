@@ -22,11 +22,13 @@ namespace sltr
 
         public Card DrawCard(bool nonDestructive = false, int depth = 0)
         {
+            if (Cards.Count == 0) { return null; }
+
             Card currentCard = Cards[Cards.Count - 1 - depth];
 
             if (!nonDestructive) Cards.Remove(currentCard);
             return currentCard;
-        }
+        } 
     }
 
     class Deck : CardPile
